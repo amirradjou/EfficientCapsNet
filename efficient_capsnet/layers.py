@@ -140,3 +140,13 @@ class DigitCap(tf.keras.layers.Layer):
                           name="digit_cap_coupling_coefficients")
         S = tf.squeeze(tf.matmul(C + self.B, U_hat), axis=-2)
         return self.squash(S)
+
+
+
+    def compute_output_shape(self,
+                             input_shape: tf.TensorShape) -> tf.TensorShape:
+        return tf.TensorShape([
+            input_shape[0],
+            self.param.num_digit_caps,
+            self.param.dim_digit_caps,
+        ])
