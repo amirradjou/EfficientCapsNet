@@ -16,5 +16,7 @@ class MarginLoss(tf.keras.losses.Loss):
         zeros = tf.zeros_like(labels, dtype=tf.float32)
         present_losses = labels * tf.square(
             tf.maximum(zeros, self.present_max - digit_probs))
-        losses = present_losses + self.absent_scale
+        absent_losses = (1 - labels) * tf.square(
+            tf.maximum(zeros, digit_probs - self.absent_min))
+        losses = present_losses + self.absent_scale * absent_losses
         return tf.reduce_sum(losses, axis=-1, name="total_loss")

@@ -1,3 +1,4 @@
+from efficient_capsnet.param import CapsNetParam
 import tensorflow as tf
 
 
@@ -38,6 +39,8 @@ class FeatureMap(tf.keras.layers.Layer):
             strides=self.param.conv2_stride,
             activation=tf.keras.activations.relu,
             name="feature_map_conv2")
+        self.norm2 = tf.keras.layers.BatchNormalization(
+            name="feature_map_norm2")
         self.conv3 = tf.keras.layers.Conv2D(
             filters=self.param.conv3_filter,
             kernel_size=self.param.conv3_kernel,
@@ -52,6 +55,9 @@ class FeatureMap(tf.keras.layers.Layer):
             strides=self.param.conv4_stride,
             activation=tf.keras.activations.relu,
             name="feature_map_conv4")
+        self.norm4 = tf.keras.layers.BatchNormalization(
+            name="feature_map_norm4")
+        self.built = True
 
     def call(self, input_images: tf.Tensor) -> tf.Tensor:
         feature_maps = self.norm1(self.conv1(input_images))
@@ -140,9 +146,7 @@ class DigitCap(tf.keras.layers.Layer):
                           name="digit_cap_coupling_coefficients")
         S = tf.squeeze(tf.matmul(C + self.B, U_hat), axis=-2)
         return self.squash(S)
-
-
-
+    
     def compute_output_shape(self,
                              input_shape: tf.TensorShape) -> tf.TensorShape:
         return tf.TensorShape([
