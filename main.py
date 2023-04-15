@@ -6,7 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import tensorflow as tf
-
+'''
+This is the main file for training and testing the Efficient CapsNet model.
+In this file, we define the flags for the training and testing process.
+We also define the functions for loading the MNIST dataset and plotting the training logs.
+'''
 FLAGS = flags.FLAGS
 flags.DEFINE_string("checkpoint_dir",
                     None,
@@ -31,6 +35,7 @@ flags.DEFINE_boolean("scale_mnist", False,
 flags.DEFINE_boolean("plot_logs", False, "Flag for plotting the saved logs.")
 
 
+'''In this function, we load the MNIST dataset and return the training and testing dataset.'''
 def _get_mnist_dataset(num_classes: int = 10, scaling: bool = False):
     (X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
     X_train = tf.cast(tf.expand_dims(X_train, axis=-1), dtype=tf.float32)
@@ -69,7 +74,13 @@ def _plot_training_logs(checkpoint_dir: str, dpi: int = 300) -> None:
         plt.legend()
         plt.savefig(f"{checkpoint_dir}/loss.png", dpi=dpi)
 
-
+'''In this function, we define the main function for training and testing the Efficient CapsNet model.
+We first define the parameters for the model and load the MNIST dataset.
+Then, we define the checkpoint directory and the number of epochs for training.
+If the checkpoint directory already exists, we load the latest checkpoint and continue training from there.
+We also define the callbacks for saving the training logs and the checkpoints.
+Finally, we train the model and save the training logs and the checkpoints.
+'''
 def main(_) -> None:
     param = efficient_capsnet.make_param()
     model = efficient_capsnet.make_model(param)

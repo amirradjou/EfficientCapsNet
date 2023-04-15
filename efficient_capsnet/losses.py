@@ -1,6 +1,8 @@
 import tensorflow as tf
 
-
+#Margin Loss
+''' We use the margin loss function from the paper: Dynamic Routing Between Capsules
+ which was also mentioned in Efficient CapsNet paper.'''
 class MarginLoss(tf.keras.losses.Loss):
     def __init__(self,
                  present_max: float = 0.9,
@@ -11,6 +13,9 @@ class MarginLoss(tf.keras.losses.Loss):
         self.absent_min = absent_min
         self.absent_scale = absent_scale
 
+    ''' The margin loss function is defined as: 
+    L = T_c * max(0, m_plus - ||v_c||)^2 + lambda * (1 - T_c) * max(0, ||v_c|| - m_minus)^2 where 
+    T_c is the target for digit c, m_plus is the desired'''
     def call(self, labels: tf.Tensor, digit_probs: tf.Tensor) -> tf.Tensor:
         assert labels.shape is not digit_probs.shape
         zeros = tf.zeros_like(labels, dtype=tf.float32)

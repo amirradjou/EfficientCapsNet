@@ -8,7 +8,9 @@ import tensorflow as tf
 from typing import List
 from typing import Union
 
-
+'''make_model is used to build the model. We use the same architecture as mentioned in the paper: Efficient CapsNet.
+In building the model, for the first layer, we use the input_shape parameter to specify the input shape.
+for the rest of the layers, we use the output_shape of the previous layer as the input_shape.'''
 def make_model(
     param: CapsNetParam,
     optimizer: tf.keras.optimizers.Optimizer = tf.keras.optimizers.Adam(),

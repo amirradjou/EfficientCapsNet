@@ -1,11 +1,12 @@
 from efficient_capsnet.param import CapsNetParam
 import tensorflow as tf
 
-
+'''Squash Class is used to squash the output of the capsule layer.'''
 class Squash(tf.keras.layers.Layer):
     def __init__(self, eps: float = 1e-7, name: str = "squash") -> None:
         super(Squash, self).__init__(name=name)
         self.eps = eps
+
 
     def call(self, input_vector: tf.Tensor) -> tf.Tensor:
         norm = tf.norm(input_vector, axis=-1, keepdims=True)
@@ -18,6 +19,10 @@ class Squash(tf.keras.layers.Layer):
         return input_shape
 
 
+'''FeatureMap Class is used to extract the feature maps from the input images. 
+We use the same architecture as mentioned in the paper: Efficient CapsNet. In building the model,
+for the first layer, we use the input_shape parameter to specify the input shape.
+for the rest of the layers, we use the output_shape of the previous layer as the input_shape.'''
 class FeatureMap(tf.keras.layers.Layer):
     def __init__(self, param: CapsNetParam, name: str = "FeatureMap") -> None:
         super(FeatureMap, self).__init__(name=name)
@@ -73,7 +78,9 @@ class FeatureMap(tf.keras.layers.Layer):
         output_shape = self.conv4.compute_output_shape(output_shape)
         return output_shape
 
-
+'''PrimaryCap Class is used to extract the primary capsules from the feature maps.
+In building the model, we use the output_shape of the previous layer as the input_shape.
+Refer to the paper: Efficient CapsNet for more details.'''
 class PrimaryCap(tf.keras.layers.Layer):
     def __init__(self, param: CapsNetParam, name: str = "PrimaryCap") -> None:
         super(PrimaryCap, self).__init__(name=name)
@@ -104,7 +111,10 @@ class PrimaryCap(tf.keras.layers.Layer):
         output_shape = self.reshape.compute_output_shape(output_shape)
         return output_shape
 
-
+'''DigitCap Class is used to extract the digit capsules from the primary capsules. 
+For each digit capsule, we use the primary capsules as the input.
+In building the model, we use the output_shape of the previous layer as the input_shape. 
+Refer to the paper: Efficient CapsNet for more details.'''
 class DigitCap(tf.keras.layers.Layer):
     def __init__(self, param: CapsNetParam, name="DigitCap") -> None:
         super(DigitCap, self).__init__(name=name)
@@ -131,6 +141,13 @@ class DigitCap(tf.keras.layers.Layer):
         self.squash = Squash(name="digit_cap_squash")
         self.built = True
 
+    '''
+    U is the input of the digit capsule. U.shape: [None, num_digit_caps, num_primary_caps, dim_primary_caps, 1]
+    U_hat is the prediction of the digit capsule.  U_hat.shape: [None, num_digit_caps, num_primary_caps, dim_digit_caps]
+    A is the attention matrix. A.shape: [None, num_digit_caps, num_primary_caps, num_primary_caps]
+    C is the coupling coefficient matrix. C.shape: [None, num_digit_caps, 1, num_primary_caps]
+    S is the output of the digit capsule. S.shape: [None, num_digit_caps, dim_digit_caps]
+    '''
     def call(self, primary_caps: tf.Tensor) -> tf.Tensor:
         U = tf.expand_dims(tf.tile(tf.expand_dims(primary_caps, axis=1),
                                    [1, self.param.num_digit_caps, 1, 1]),
