@@ -116,7 +116,8 @@ def main(_) -> None:
               validation_split=FLAGS.validation_split,
               initial_epoch=initial_epoch,
               epochs=initial_epoch + num_epochs,
-              callbacks=[csv_logger, model_saver])
+              callbacks=[csv_logger, model_saver],
+              batch_size= 16)
     model.save(f"{checkpoint_dir}/model")
     param.save_config(f"{checkpoint_dir}/config.txt")
 
