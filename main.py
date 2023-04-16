@@ -60,25 +60,12 @@ class CapsNetParam(object):
         }
 
     def save_config(self, path: str) -> None:
-
-        if not isinstance(path, str):
-            raise TypeError()
-        elif len(path) == 0:
-            raise ValueError()
-        else:
-            with open(path, 'w', encoding='utf8') as f:
-                for k, v in self.get_config().items():
-                    f.writelines(f"{k}={v}\n")
+        with open(path, 'w', encoding='utf8') as f:
+            for k, v in self.get_config().items():
+                f.writelines(f"{k}={v}\n")
 
 
 def load_config(path: str) -> CapsNetParam:
-    if not isinstance(path, str):
-        raise TypeError()
-    elif len(path) == 0:
-        raise ValueError()
-    elif not os.path.isfile(path):
-        raise FileNotFoundError()
-
     with open(path, 'r', encoding="utf8") as f:
         config = []
         for l in f.readlines():
@@ -186,18 +173,9 @@ def main(_) -> None:
             model.load_weights(
                 filepath=f"{checkpoint_dir}/{checkpoint_name}.ckpt")
 
-    csv_logger = tf.keras.callbacks.CSVLogger(
-        filename=f"{checkpoint_dir}/train_log.csv", append=True)
-    model_saver = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir +
-                                                     "/{epoch:04d}.ckpt",
-                                                     save_weights_only=True)
-    model.fit(x=X_train,
-              y=y_train,
-              validation_split=FLAGS.validation_split,
-              initial_epoch=initial_epoch,
-              epochs=initial_epoch + num_epochs,
-              callbacks=[csv_logger, model_saver],
-              batch_size= 16)
+    csv_logger = tf.keras.callbacks.CSVLogger(filename=f"{checkpoint_dir}/train_log.csv", append=True)
+    model_saver = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir +"/{epoch:04d}.ckpt",save_weights_only=True)
+    model.fit(x=X_train,y=y_train,validation_split=FLAGS.validation_split,initial_epoch=initial_epoch,epochs=initial_epoch + num_epochs,callbacks=[csv_logger, model_saver],batch_size= 16)
     model.save(f"{checkpoint_dir}/model")
     param.save_config(f"{checkpoint_dir}/config.txt")
 
