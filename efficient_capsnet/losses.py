@@ -36,8 +36,6 @@ class MarginLoss(tf.keras.losses.Loss):
         return not self.__eq__(other)
     def __hash__(self):
         return hash((self.present_max, self.absent_min, self.absent_scale))
-    def __call__(self, labels, digit_probs):
-        return self.call(labels, digit_probs)
     def __getstate__(self):
         return self.__dict__
     def __setstate__(self, state):
