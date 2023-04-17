@@ -175,7 +175,7 @@ def main(_) -> None:
 
     csv_logger = tf.keras.callbacks.CSVLogger(filename=f"{checkpoint_dir}/train_log.csv", append=True)
     model_saver = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir +"/{epoch:04d}.ckpt",save_weights_only=True)
-    model.fit(x=X_train,y=y_train,validation_split=FLAGS.validation_split,initial_epoch=initial_epoch,epochs=initial_epoch + num_epochs,callbacks=[csv_logger, model_saver],batch_size= 16)
+    model.fit(x=X_train,y=y_train,validation_split=FLAGS.validation_split,initial_epoch=initial_epoch,epochs=initial_epoch + num_epochs,callbacks=[csv_logger, model_saver], batch_size=16)
     model.save(f"{checkpoint_dir}/model")
     param.save_config(f"{checkpoint_dir}/config.txt")
 
